@@ -3,21 +3,22 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
+  base: './', // 👈 ESSENCIAL para corrigir erro no deploy da Vercel
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'), // Agora você pode usar @/components por exemplo
+      '@': path.resolve(__dirname, './src'),
     },
   },
   server: {
-    port: 3000,        // Porta padrão ao rodar o projeto localmente
-    open: true,        // Abre automaticamente o navegador ao iniciar o dev server
+    port: 3000,
+    open: true,
   },
   build: {
-    outDir: 'dist',    // Pasta de saída para build
-    sourcemap: false,  // Pode ativar true para debug em produção
+    outDir: 'dist',
+    sourcemap: false,
   },
   define: {
-    'process.env': {}, // Suporte básico para process.env (ambiente)
+    'process.env': {},
   },
 });
