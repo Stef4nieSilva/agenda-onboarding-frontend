@@ -1,6 +1,6 @@
 // ProgressBar.jsx
 import React from "react";
-import "./Progressbar.css";
+import "./ProgressBar.css";
 
 export default function progressBar({ percentage, meta }) {
   const faltando = Math.max(0, meta - percentage);
