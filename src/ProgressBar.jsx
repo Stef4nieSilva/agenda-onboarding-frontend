@@ -26,3 +26,4 @@ export default function ProgressBar({ percentage, meta }) {
     </div>
   );
 }
+// ajuste forçado para redeploy final
