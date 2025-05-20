@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useTheme } from "./ThemeContext";
 import FlipCardAgente from "./FlipCardAgente";
 import SidebarDetalhes from "./SidebarDetalhes";
-import "./Dashboard.css";
+import './DashboardAgentes.css';
 
 export default function DashboardAgentes() {
   const { tema } = useTheme();
