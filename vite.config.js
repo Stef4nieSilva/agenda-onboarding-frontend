@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-  base: './', // 👈 ESSENCIAL para corrigir erro no deploy da Vercel
+  base: './', // ✅ ESSENCIAL para Vercel encontrar os arquivos corretamente
   plugins: [react()],
   resolve: {
     alias: {
