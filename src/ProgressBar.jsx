@@ -2,7 +2,7 @@
 import React from "react";
 import "./Progressbar.css"; // importe o CSS específico aqui
 
-export default function ProgressBar({ percentage, meta }) {
+export default function progressBar({ percentage, meta }) {
   const faltando = Math.max(0, meta - percentage);
 
   return (
