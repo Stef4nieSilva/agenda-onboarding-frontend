@@ -1,24 +1,19 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "./ThemeContext";
-import ProgressBar from "./ProgressBar";
 import "./App.css";
-import { Link } from "react-router-dom";
+import GaugeChart from "./components/GaugeChart";
+import SidebarDetalhesSensiveis from "./components/SidebarDetalhesSensiveis";
 
 export default function Dashboard() {
   const { tema } = useTheme();
   const [agendamentos, setAgendamentos] = useState([]);
   const [alertasMatricula, setAlertasMatricula] = useState([]);
-  const [mostrarSidebar, setMostrarSidebar] = useState(false);
 
-  if (localStorage.getItem("acessoLiberado") !== "true") {
-    return (
-      <div className="tela-senha">
-        <h2>⛔ Acesso negado</h2>
-        <p>Você precisa digitar a senha na tela inicial para visualizar esta página.</p>
-        <a href="/" className="botao-link">Voltar</a>
-      </div>
-    );
-  }
+  const [mostrarDetalhesSensiveis, setMostrarDetalhesSensiveis] = useState(false);
+  const [alunosSensiveis, setAlunosSensiveis] = useState([]);
+  const [statusSelecionado, setStatusSelecionado] = useState("");
+  const [mostrarAnalise, setMostrarAnalise] = useState(false);
+  const [comerciaisComProblemas, setComerciaisComProblemas] = useState([]);
 
   useEffect(() => {
     fetch("https://api.sheetbest.com/sheets/f6d72757-6186-4c31-a811-3295c2e79eeb/tabs/Onboarding%20Maio")
@@ -29,23 +24,46 @@ export default function Dashboard() {
           email: item["EMAIL"]?.trim(),
           nome: item["ALUNO"]?.trim(),
           dataMatricula: item["DATA MAT"]?.trim(),
+          telefone: item["TELEFONE"]?.trim(),
+          comercial: item["COMERCIAL"]?.trim(),
         }));
 
         setAgendamentos(adaptado);
 
-        const hoje = new Date();
-        const alerta = adaptado.filter((aluno) => {
-          const [dia, mes, ano] = aluno.dataMatricula?.split("/") || [];
-          if (!dia || !mes || !ano) return false;
-          const dataMatricula = new Date(`${ano}-${mes}-${dia}`);
-          const diffDias = Math.floor((hoje - dataMatricula) / (1000 * 60 * 60 * 24));
-          return diffDias === 6 || diffDias === 7;
-        });
+        // Filtrando os alunos com status críticos:
+        const statusExcluidos = [
+          "inválido",
+          "inacessível",
+          "desconhece aluno",
+          "chargeback",
+          "cancelado antes",
+          "caso auditoria",
+        ];
 
-        setAlertasMatricula(alerta);
+        const alunosComStatusCriticos = adaptado.filter((aluno) =>
+          statusExcluidos.includes(aluno.status)
+        );
+
+        // Agrupando os alunos por comercial:
+        const agrupamentoPorComercial = alunosComStatusCriticos.reduce((acc, aluno) => {
+          const comercial = aluno.comercial || "Sem Comercial"; // Caso o comercial seja nulo ou indefinido
+          if (!acc[comercial]) {
+            acc[comercial] = 0;
+          }
+          acc[comercial]++;
+          return acc;
+        }, {});
+
+        // Ordenando os comerciais e pegando os 5 primeiros:
+        const topComerciais = Object.entries(agrupamentoPorComercial)
+          .sort((a, b) => b[1] - a[1])  // Ordena do maior para o menor
+          .slice(0, 5); // Pega os 5 comerciais mais problemáticos
+
+        setComerciaisComProblemas(topComerciais);
       });
   }, []);
 
+  // Restante da lógica de agendamentos e status
   const agendamentosValidos = agendamentos.filter((a) => a.email);
   const totalAlunos = agendamentosValidos.length;
 
@@ -76,6 +94,7 @@ export default function Dashboard() {
     : "0.00";
 
   const todosStatus = [
+    "resolvido",
     "agendado",
     "andamento",
     "sem retorno",
@@ -87,14 +106,6 @@ export default function Dashboard() {
     "inválido",
   ];
 
-  const formatStatusClass = (status) => {
-    return status
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .replace(/\s+/g, "-");
-  };
-
   const contagemPorStatus = {};
   todosStatus.forEach((status) => {
     contagemPorStatus[status] = agendamentosValidos.filter(
@@ -102,80 +113,150 @@ export default function Dashboard() {
     ).length;
   });
 
+  const porcentagemPorStatus = {};
+  todosStatus.forEach((status) => {
+    const quantidade = contagemPorStatus[status] || 0;
+    porcentagemPorStatus[status] = totalAlunos
+      ? ((quantidade / totalAlunos) * 100).toFixed(1)
+      : "0.0";
+  });
+
   return (
     <div className={`container ${tema === "escuro" ? "escuro" : "claro"}`}>
       <div className="header-topo">
         <h1 className="titulo">Análise Geral</h1>
         <div className="linha-horizontal"></div>
-        {alertasMatricula.length > 0 && (
-          <div className="alerta-icon" onClick={() => setMostrarSidebar(!mostrarSidebar)}>
-            ⚠️
+      </div>
+
+      <div className="dashboard-metricas">
+        <div className="metric-box">
+          <div className="metric-titulo">Resolvidos em Carteira Cheia</div>
+          <div className="barra-resumo">
+            <div className="barra-preenchida" style={{ width: `${porcentagemResolvidos}%` }}></div>
+            <span className="valor">{porcentagemResolvidos}%</span>
           </div>
-        )}
-      </div>
+        </div>
 
-      {mostrarSidebar && (
-        <div className="alerta-sidebar">
-          <h3>⚠️ Matrículas com 6 ou 7 dias</h3>
-          <ul>
-            {alertasMatricula.map((aluno, idx) => (
-              <li key={idx}>
-                <strong>{aluno.nome}</strong><br />
-                📅 {aluno.dataMatricula}<br />
-                📧 {aluno.email}
-              </li>
-            ))}
-          </ul>
+        <div className="metric-box">
+          <div className="metric-titulo">Resolvidos em Carteira Limpa</div>
+          <div className="barra-resumo">
+            <div className="barra-preenchida" style={{ width: `${porcentagemResolvidosFiltrado}%` }}></div>
+            <span className="valor">{porcentagemResolvidosFiltrado}%</span>
+          </div>
         </div>
-      )}
 
-      <div className="lista-status">
-        <div className="card-dashboard destaque">
-          Total de Alunos
-          <div style={{ fontSize: "24px" }}>{totalAlunos}</div>
-        </div>
-        <div className="card-dashboard destaque">
-          Resolvidos: Zoom
-          <div style={{ fontSize: "24px" }}>{totalResolvidosFiltrado}</div>
-        </div>
-        <div className="card-dashboard destaque">
-          Total Não Resolvíveis
-          <div style={{ fontSize: "24px" }}>{totalNaoResolvidos}</div>
-        </div>
-        <div className="card-dashboard destaque">
-          Carteira Cheia
-          <div style={{ fontSize: "24px" }}>{porcentagemResolvidos}%</div>
-        </div>
-        <div className="card-dashboard destaque">
-          Carteira Ativa
-          <div style={{ fontSize: "24px" }}>{porcentagemResolvidosFiltrado}%</div>
-        </div>
-      </div>
-
-      <div style={{ margin: "30px auto", maxWidth: "600px" }}>
-        <ProgressBar
-          percentage={parseFloat(porcentagemResolvidosFiltrado)}
-          meta={95}
-        />
-      </div>
-
-      <div className="linha-separadora"></div>
-
-      <div className="lista-status">
-        {todosStatus.map((status, idx) => (
-          <div
-            key={idx}
-            className={`card-dashboard card-${formatStatusClass(status)}`}
-          >
-            <span className="status-titulo">
-              {status.charAt(0).toUpperCase() + status.slice(1)}
+        <div className="metric-box destaque-final">
+          <div className="faltam-destaque">
+            Faltam para Bater a Meta: <span className="faltam-valor">
+              {(95 - parseFloat(porcentagemResolvidosFiltrado)).toFixed(2)}%
             </span>
-            <div style={{ fontSize: "20px", marginTop: "8px", textAlign: "center" }}>
-              {contagemPorStatus[status]}
-            </div>
           </div>
-        ))}
+        </div>
       </div>
+
+      <div className="linha-horizontal"></div>
+
+      <div className="gauge-bloco">
+        <div className="painel-graficos">
+          <div className="total-carteira destaque-label">TOTAL CARTEIRA: {totalAlunos}</div>
+        </div>
+
+        <div className="cards-graficos">
+          {todosStatus.map((status, idx) => {
+            const alunosDoStatus = agendamentosValidos.filter((a) => a.status === status);
+            const quantidade = alunosDoStatus.length;
+            const porcentagem = porcentagemPorStatus[status];
+
+            return (
+              <div
+                key={idx}
+                className={`grafico-card card-${status.replace(/\s/g, "-")}`}
+                onClick={() => {
+                  const statusSensivel = [
+                    "cancelado antes",
+                    "caso auditoria",
+                    "chargeback",
+                    "desconhece aluno",
+                    "inacessível",
+                    "inválido",
+                  ];
+                  if (statusSensivel.includes(status)) {
+                    setAlunosSensiveis(alunosDoStatus);
+                    setStatusSelecionado(status);
+                    setMostrarDetalhesSensiveis(true);
+                  }
+                }}
+              >
+                <GaugeChart
+                  status={status.charAt(0).toUpperCase() + status.slice(1)}
+                  valor={porcentagem}
+                  cor="#8f4de9"
+                />
+                <div className="grafico-dados">
+                  <strong>{quantidade}</strong> alunos
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Botão de Análise de Comerciais no final da página */}
+      <button
+        className="botao-analise"
+        onClick={() => setMostrarAnalise(true)} // Exibe a análise de comerciais
+      >
+        Análise de Comerciais
+      </button>
+
+      {/* Exibindo a análise de comerciais */}
+{mostrarAnalise && (
+  <div className="analise-comerciais">
+    <h3 className="titulo-analise">Top 5 Comerciais com Mais Assinaturas Desqualificadas</h3>
+
+    {/* Container para a tabela de análise */}
+    <div className="analise-container">
+      {/* Tabela de ranking de comerciais */}
+      <table className="ranking-tabela">
+        <thead>
+          <tr>
+            <th>Posição</th>
+            <th>Comercial</th>
+            <th>Quantidade de Matrículas</th>
+          </tr>
+        </thead>
+        <tbody>
+          {comerciaisComProblemas.map((item, index) => (
+            <tr
+              key={index}
+              className={`ranking-item ${index === 0 ? "top1" : index === 1 ? "top2" : index === 2 ? "top3" : ""}`}
+            >
+              <td className="ranking-posicao">#{index + 1}</td>
+              <td className="ranking-comercial">{item[0]}</td>
+              <td className="ranking-quantidade">{item[1]} matrículas</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    {/* Botão de fechar a análise */}
+    <button
+      className="botao-fechar-analise"
+      onClick={() => setMostrarAnalise(false)} // Fecha a análise
+    >
+      Fechar
+    </button>
+  </div>
+)}
+
+      {mostrarDetalhesSensiveis && (
+        <SidebarDetalhesSensiveis
+          alunos={alunosSensiveis}
+          status={statusSelecionado}
+          onClose={() => setMostrarDetalhesSensiveis(false)}
+        />
+      )}
     </div>
   );
 }

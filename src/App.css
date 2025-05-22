@@ -287,7 +287,7 @@ html.escuro,
   padding: 16px;
   width: 100%;
   border: 1px solid #ccc;
-  box-shadow: 0 2px 8px rgb(175, 152, 152);
+  box-shadow: 0 2px 8px #7b3ed1 (175, 152, 152);
   transition: transform 0.2s;
 }
 
@@ -444,25 +444,6 @@ html.escuro,
   font-style: italic;
   color: #cccccc;
   margin-top: 10px;
-}
-
-/* ---------- TELA DE SENHA ---------- */
-.tela-senha {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background-color: #fdfdfd; /* claro */
-  color: #1f0033; /* texto escuro */
-  text-align: center;
-  padding: 20px;
-}
-
-/* Modo escuro - tela de senha */
-.container.escuro .tela-senha {
-  background-color: #202123; /* escuro */
-  color: #ECECF1; /* texto claro */
 }
 
 /* Input senha - claro */
@@ -799,222 +780,6 @@ html.escuro,
   border-color: #a259ff;
 }
 
-/* ---------- CARTÕES DASHBOARD - MODO ESCURO ---------- */
-.container.escuro .card-dashboard {
-  background-color: #a259ff;
-  color: #ECECF1;
-  border: 1px solid #a259ff;
-  box-shadow: 0 0 6px rgb(43, 3, 3);
-  border-radius: 14px;
-  padding: 20px;
-  width: 220px;
-  min-height: 120px;
-  text-align: center;
-  font-weight: 600;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  transition: transform 0.2s ease;
-}
-
-.container.escuro .card-dashboard.destaque {
-  background-color: #a259ff !important;
-  color: white;
-  font-size: 20px;
-  font-weight: 700;
-}
-
-.container.escuro .card-dashboard:hover {
-  transform: scale(1.03);
-  border-color: #a259ff;
-}
-
-/* ---------- STATUS TÍTULO E ÍCONE HOVER ---------- */
-.card-dashboard {
-  position: relative; /* para posicionar o ícone */
-}
-
-.card-dashboard span.status-titulo {
-  font-size: 14px;
-  margin-bottom: 8px;
-  display: block;
-}
-
-.card-dashboard:hover::after {
-  content: "🔍";
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  font-size: 16px;
-}
-
-/* ---------- STATUS DOS CARDS - MODO CLARO ---------- */
-.container.claro .card-agendado {
-  background-color: #9799a3 !important;
-  color: #000000 !important;
-  border: 1px solid #5b5b5e;
-  box-shadow: 0 0 6px rgba(121, 134, 203, 0.3);
-}
-
-.container.claro .card-andamento {
-  background-color: #9799a3 !important;
-  color: #000000 !important;
-  border: 1px solid #5b5b5e;
-  box-shadow: 0 0 6px rgba(253, 216, 53, 0.3);
-}
-
-.container.claro .card-cancelado-antes,
-.container.claro .card-chargeback,
-.container.claro .card-caso-auditoria {
-  background-color: #9799a3 !important;
-  color: #000000 !important;
-  border: 1px solid #5b5b5e;
-  box-shadow: 0 0 6px rgba(94, 93, 102, 0.3);
-}
-
-.container.claro .card-desconhece-aluno {
-  background-color: #9799a3 !important;
-  color: #000000 !important;
-  border: 1px solid #5b5b5e;
-  box-shadow: 0 0 5px rgba(204, 204, 204, 0.3);
-}
-
-.container.claro .card-inacessivel,
-.container.claro .card-invalido {
-  background-color: #9799a3 !important;
-  color: #000000 !important;
-  border: 1px solid #5b5b5e;
-  box-shadow: 0 0 5px rgba(160, 160, 160, 0.3);
-}
-
-.container.claro .card-sem-retorno {
-  background-color: #9799a3 !important;
-  color: #000000 !important;
-  border: 1px solid #5b5b5e;
-  box-shadow: 0 0 6px rgba(162, 144, 200, 0.3);
-}
-
-
-/* ---------- STATUS DOS CARDS - MODO ESCURO ---------- */
-.container.escuro .card-agendado {
-  background-color: #dbdeee !important;
-  color: #000000 !important;
-  border: 1px solid #7986cb;
-  box-shadow: 0 0 6px rgba(121, 134, 203, 0.5);
-}
-
-.container.escuro .card-andamento {
-  background-color: #dbdeee !important;
-  color: #000000 !important;
-  border: 1px solid #7986cb;
-  box-shadow: 0 0 6px rgba(253, 216, 53, 0.5);
-}
-
-.container.escuro .card-cancelado-antes,
-.container.escuro .card-chargeback,
-.container.escuro .card-caso-auditoria {
-  background-color: #dbdeee !important;
-  color: #000000 !important;
-  border: 1px solid #7986cb;
-  box-shadow: 0 0 6px rgba(138, 138, 149, 0.5);
-}
-
-.container.escuro .card-desconhece-aluno {
-  background-color: #dbdeee !important;
-  color: #000000 !important;
-  border: 1px solid #7986cb;
-  box-shadow: 0 0 5px rgba(214, 214, 214, 0.6);
-}
-
-.container.escuro .card-inacessivel,
-.container.escuro .card-invalido {
-  background-color: #dbdeee !important;
-  color: #000000 !important;
-  border: 1px solid #7986cb;
-  box-shadow: 0 0 5px rgba(191, 191, 191, 0.5);
-}
-
-.container.escuro .card-sem-retorno {
-  background-color: #dbdeee !important;
-  color: #000000 !important;
-  border: 1px solid #7986cb;
-  box-shadow: 0 0 6px rgba(123, 48, 209, 0.5);
-}
-/* ANIMAÇÃO DE ENTRADA SUAVE NA TELA DE SENHA */
-.tela-senha {
-  animation: fadeInUp 0.6s ease forwards;
-  opacity: 0; /* começa invisível */
-  transform: translateY(20px); /* começa mais embaixo */
-}
-
-/* Definição da animação */
-@keyframes fadeInUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}/* Card centralizado para login */
-.card-login {
-  background-color: white;
-  padding: 40px 30px;
-  border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  max-width: 500px;
-  width: 90%;
-  animation: fadeInUp 0.6s ease forwards;
-}
-
-/* Imagem menor */
-.imagem-login {
-  max-width: 100%;
-  height: auto;
-  margin-bottom: 20px;
-  border-radius: 12px;
-}
-
-/* Título bem destacado */
-.titulo-onboarding {
-  font-size: 2.8rem;
-  font-weight: 800;
-  color: #1f0033;
-  margin-bottom: 10px;
-}
-
-.subtitulo-onboarding {
-  font-size: 1rem;
-  color: #888;
-  margin-bottom: 30px;
-}
-
-/* Input */
-.input-senha {
-  padding: 12px;
-  width: 100%;
-  max-width: 300px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  font-size: 16px;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-/* Botão */
-.card-login button {
-  background-color: #a259ff;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 10px;
-  font-weight: bold;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.card-login button:hover {
-  background-color: #7b30d1;
-}
 /* ─────────────────────────────────────────────── */
 /* 🎯 CONTAINER GERAL DOS CARDS DE AGENTES         */
 /* ─────────────────────────────────────────────── */
@@ -1073,4 +838,378 @@ html.escuro,
   height: 4px;
   background-color: #a259ff;
   border-radius: 2px;
+}
+/* MODO CLARO */
+.container.claro .bloco-agente-conteudo.ausente {
+  background-color: #333;         /* cinza escuro */
+  color: #e6e6e6;                 /* cinza claro */
+}
+
+/* MODO ESCURO */
+.container.escuro .bloco-agente-conteudo.ausente {
+  background-color: #e4e4e4;      /* cinza claro */
+  color: #2c2c2c;                 /* cinza escuro */
+}
+/* Ausente no modo claro */
+.container.claro .bloco-agente-conteudo.ausente {
+  background-color: #333333;  /* cinza escuro */
+  color: #cccccc;             /* cinza claro */
+}
+
+/* Ausente no modo escuro */
+.container.escuro .bloco-agente-conteudo.ausente {
+  background-color: #d4d4d4;  /* cinza claro */
+  color: #2b2b2b;             /* cinza escuro */
+}
+/* ---------- MODO ESCURO ---------- */
+:root {
+  --cor-fundo: #121216;
+  --cor-cartao: #1e1e24;
+  --cor-borda: #8f4de9;
+  --cor-titulo: #ffffff;
+  --cor-subtitulo: #cfcfcf;
+  --cor-destaque: #a871f7;
+  --cor-titulo-destaque: #ffffff;
+  --cor-titulo-barra: #8f4de9;
+}
+
+/* ---------- MODO CLARO ---------- */
+body.claro {
+  --cor-fundo: #ffffff;
+  --cor-cartao: #f5f1fc;
+  --cor-borda: #8f4de9;
+  --cor-titulo: #1f0033;
+  --cor-subtitulo: #4a4a4a;
+  --cor-destaque: #7b3ed1;
+  --cor-titulo-destaque: #ffffff;
+  --cor-titulo-barra: #7b3ed1;
+}
+/* ---------- DASHBOARD GERAL ---------- */
+.dashboard-metricas {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin: 30px auto;
+  flex-wrap: wrap;
+}
+
+.metric-box {
+  background-color: var(--cor-cartao);
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  min-width: 240px;
+  flex: 1 1 250px;
+  text-align: center;
+}
+
+.metric-titulo {
+  font-weight: bold;
+  color: var(--cor-texto);
+  margin-bottom: 10px;
+}
+
+.barra-resumo {
+  background-color: #3c3c3c;
+  border-radius: 10px;
+  position: relative;
+  height: 20px;
+  margin-top: 10px;
+}
+
+.barra-preenchida {
+  background-color: #8f4de9;
+  height: 100%;
+  border-radius: 10px 0 0 10px;
+}
+
+.valor {
+  color: white;
+  font-weight: bold;
+  position: absolute;
+  right: 10px;
+  top: 2px;
+  font-size: 14px;
+}
+
+.faltam {
+  color: white;
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.total-carteira {
+  background-color: #8f4de9;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  border-radius: 10px;
+  padding: 8px;
+  margin: 40px auto 20px;
+  width: fit-content;
+}
+
+.painel-graficos {
+  width: 100%;
+  margin-top: 40px;
+}
+
+.cards-graficos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+  padding: 20px;
+}
+
+/* ---------- GRAFICOS CARD - DIFERENCIAÇÃO PARA MODO CLARO E ESCURO ---------- */
+.grafico-card {
+  background-color: #302e2e; /* fundo escuro padrão */
+  color: #ffffff; /* texto branco */
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  padding: 16px;
+  min-width: 140px;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+/* Modo claro */
+.container.claro .grafico-card {
+  background-color: var(--cor-cartao);
+  color: var(--cor-texto);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover nos cards de gráfico */
+.grafico-card:hover {
+  transform: scale(1.03);
+}
+
+/* Detalhamento de falta nos gráficos */
+.faltam-destaque {
+  animation: pulse 2s infinite;
+  font-weight: bold;
+  color: #fdd835;
+}
+
+/* Animação de destaque */
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Texto de destaque de falta */
+.faltam-destaque {
+  text-align: center;
+  font-size: 25px;
+  color: #8f4de9;
+  margin-top: 8px;
+}
+
+/* Valor de falta destacado */
+.faltam-valor {
+  background-color: #8f4de9;
+  color: white;
+  padding: 4px 10px;
+  margin-left: 6px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+/* ---------- CARD DE ALUNO ---------- */
+.card-aluno {
+  background-color: #2c2c2c;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin: 12px auto;
+  max-width: 320px;
+  min-width: 280px;
+  width: 90%;
+  color: white;
+  font-size: 14px;
+  line-height: 1.5;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.card-aluno strong {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.btn-fechar-sidebar {
+  margin-top: 16px;
+  padding: 6px 14px;
+  background-color: transparent;
+  color: #f1e3ff;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.btn-fechar-sidebar:hover {
+  color: white;
+  text-decoration: underline;
+}
+
+/* ---------- MODO ESCURO - GRAFICOS CARD ---------- */
+.container.escuro .grafico-card {
+  background-color: #2c2c2c; /* fundo escuro */
+  color: #ECECF1; /* texto claro */
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+}
+
+/* Modo escuro - Card de aluno */
+.container.escuro .card-aluno {
+  background-color: #3a3b3f;
+  color: #ECECF1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+/* Estilo para o painel de Análise */
+.analise-comerciais {
+  background-color: #0e0d0d;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 800px; /* Tamanho máximo da análise */
+  margin: 30px auto; /* Centraliza o painel na tela */
+  text-align: center;
+}
+
+.analise-comerciais h3 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  color: #8f4de9;
+}
+
+/* Estilo para o painel de Análise */
+.analise-comerciais {
+  background-color: var(--cor-fundo); /* Usa a cor do fundo do tema (diurno/noturno) */
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 30px auto;
+  text-align: center;
+}
+
+/* Título da análise */
+.titulo-analise {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  color: var(--cor-titulo-destaque); /* Cor do título adaptada ao tema */
+}
+
+/* Estilo do container da tabela */
+.analise-container {
+  background-color: var(--cor-cartao); /* Cor do fundo do container (diurno/noturno) */
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  overflow-x: auto; /* Permite rolagem horizontal se necessário */
+}
+
+/* Estilo da Tabela */
+.ranking-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+/* Estilo das células da tabela */
+.ranking-tabela th,
+.ranking-tabela td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid var(--cor-borda); /* Cor da borda adaptada ao tema */
+}
+
+/* Cor de fundo do cabeçalho da tabela */
+.ranking-tabela th {
+  background-color: var(--cor-titulo-barra); /* Cor do cabeçalho no modo diurno/noturno */
+  color: white;
+}
+
+/* Estilo das linhas da tabela */
+.ranking-tabela tbody tr {
+  background-color: var(--cor-cartao); /* Cor das linhas da tabela */
+}
+
+/* Efeito hover nas linhas da tabela */
+.ranking-tabela tbody tr:hover {
+  background-color: var(--cor-fundo); /* Altera a cor de fundo ao passar o mouse */
+}
+
+/* Estilo para cada item no ranking */
+.ranking-item .ranking-posicao {
+  font-weight: bold;
+  color: var(--cor-titulo-destaque); /* Cor do número de posição */
+}
+
+/* Estilo para o nome do comercial */
+.ranking-item .ranking-comercial {
+  font-weight: bold;
+  color: var(--cor-titulo); /* Cor do nome do comercial */
+}
+
+/* Estilo para a quantidade de matrículas */
+.ranking-item .ranking-quantidade {
+  color: var(--cor-destaque); /* Cor do número de matrículas */
+  font-weight: bold;
+}
+
+/* Destaque para os primeiros lugares no ranking */
+.top1 {
+  background-color: #f7d36b; /* Ouro */
+}
+
+.top2 {
+  background-color: #d8d8d8; /* Prata */
+}
+
+.top3 {
+  background-color: #cd7f32; /* Bronze */
+}
+
+/* Botão Fechar */
+.botao-fechar-analise {
+  background-color: var(--cor-titulo-barra); /* Cor do botão igual ao cabeçalho */
+  color: white;
+  text-align: center;
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border: none;
+  margin-top: 20px;
+}
+
+/* Efeito hover no botão */
+.botao-fechar-analise:hover {
+  background-color: var(--cor-borda); /* Cor do botão no hover */
+}
+/* Estilo para o botão de fechar */
+.botao-fechar-analise {
+  background: linear-gradient(45deg, #7b30d1, #a259ff); /* Gradiente suave lilás */
+  color: white;
+  padding: 12px 28px;
+  font-size: 16px;
+  border-radius: 50px; /* Bordas arredondadas */
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease; /* Transição suave */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+/* Efeito hover no botão */
+.botao-fechar-analise:hover {
+  background: linear-gradient(45deg, #a259ff, #7b30d1); /* Inverte o gradiente no hover */
+  transform: translateY(-4px); /* Desloca o botão para cima */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Aumenta a sombra no hover */
 }

@@ -12,19 +12,21 @@ import DashboardAgentes from "./DashboardAgentes"; // importe o novo componente
 function AppContent() {
   const { tema } = useTheme();
 
+  // ✅ Adiciona a classe no <body>
+  useEffect(() => {
+    document.body.className = tema;
+  }, [tema]);
+
   return (
     <div className={`container ${tema === "escuro" ? "escuro" : "claro"}`}>
       <Router>
         <BotaoTema />
 
-        {/* Navegação só aparece se tiver acesso liberado */}
-        {localStorage.getItem("acessoLiberado") === "true" && (
-          <div className="nav-topo">
-            <Link to="/" className="botao-navegacao">Agenda</Link>
-            <Link to="/dashboard" className="botao-navegacao">Dashboard Análise</Link>
-            <Link to="/dashboard/agentes" className="botao-navegacao">Análise dos Agentes</Link>
-          </div>
-        )}
+        <div className="nav-topo">
+          <Link to="/" className="botao-navegacao">Agenda</Link>
+          <Link to="/dashboard" className="botao-navegacao">Dashboard Análise</Link>
+          <Link to="/dashboard/agentes" className="botao-navegacao">Análise dos Agentes</Link>
+        </div>
 
         {/* ROTAS */}
         <Routes>

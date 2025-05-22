@@ -1,0 +1,91 @@
+/* Estilo base para VisaoMensal */
+
+.grade-mensal {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+  padding: 20px;
+}
+
+.bloco-dia {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 140px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--cor-borda-card);
+  background-color: var(--cor-card);
+  color: var(--cor-texto);
+  transition: 0.3s;
+}
+
+.bloco-dia:hover {
+  box-shadow: 0 0 6px var(--cor-sombra-card);
+}
+
+.cabecalho-dia {
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--cor-titulo);
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.agentes-dia {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+}
+
+.foto-agente-mini {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--cor-roxo-principal);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.foto-agente-mini:hover {
+  transform: scale(1.1);
+}
+
+.foto-agente-mini img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rodape-total {
+  font-size: 12px;
+  color: var(--cor-texto-suave);
+  text-align: center;
+  padding-top: 4px;
+}
+
+/* Tema escuro */
+:root {
+  --cor-card: #292929;
+  --cor-borda-card: #333;
+  --cor-texto: #ffffff;
+  --cor-texto-suave: #c2b7d7;
+  --cor-titulo: #ffffff;
+  --cor-roxo-principal: #8f4de9;
+  --cor-roxo-hover: #7b3ed1;
+  --cor-sombra-card: rgba(0, 0, 0, 0.2);
+}
+
+/* Tema claro */
+body.claro {
+  --cor-card: #ceb9f1;
+  --cor-borda-card: #c2aaf1;
+  --cor-texto: #1f0033;
+  --cor-texto-suave: #781ef5;
+  --cor-titulo: #7c2fbb;
+  --cor-roxo-principal: #a755df;
+  --cor-roxo-hover: #7c2fbb;
+  --cor-sombra-card: rgba(167, 85, 223, 0.2);
+}

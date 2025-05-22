@@ -1,0 +1,141 @@
+/* ===================== SIDEBAR MENSAL ===================== */
+
+.sidebar-mensal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 320px;
+  height: 100vh;
+  background-color: var(--cor-sidebar-fundo);
+  color: var(--cor-texto);
+  padding: 20px;
+  overflow-y: auto;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  border-left: 2px solid var(--cor-roxo);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.sidebar-mensal.oculta {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.sidebar-mensal h2 {
+  font-size: 18px;
+  margin-bottom: 18px;
+  color: var(--cor-titulo-lateral);
+  text-align: center;
+  font-weight: bold;
+  border-bottom: 1px solid var(--cor-borda);
+  padding-bottom: 8px;
+}
+
+.item-agendamento {
+  background-color: var(--cor-card-agendamento);
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--cor-borda-agendamento);
+  transition: 0.2s ease;
+  font-size: 13px;
+}
+
+.item-agendamento:hover {
+  transform: scale(1.01);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.item-agendamento p {
+  margin: 3px 0;
+  font-size: 13px;
+}
+
+.status-resolvido {
+  display: inline-block;
+  background-color: var(--cor-status-bg);
+  color: var(--cor-status-texto);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.status-agendado {
+  display: inline-block;
+  background-color: var(--cor-status-ag-bg);
+  color: var(--cor-status-ag-texto);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.botao-fechar {
+  background-color: var(--cor-botao-fechar);
+  color: var(--cor-botao-fechar-texto);
+  border: none;
+  padding: 10px 14px;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.botao-fechar:hover {
+  background-color: var(--cor-botao-fechar-hover);
+  
+}
+
+
+/* Responsivo */
+@media (max-width: 600px) {
+  .sidebar-mensal {
+    width: 100vw;
+    height: auto;
+    min-height: 50vh;
+    bottom: 0;
+    top: auto;
+    border-left: none;
+    border-top: 2px solid var(--cor-roxo);
+  }
+}
+
+/* ===================== CORES BASE ===================== */
+:root {
+  --cor-sidebar-fundo: #a259ff;
+  --cor-titulo-lateral: #fffdfd;
+  --cor-texto: #e2e0e0;
+  --cor-borda: #333;
+  --cor-status-bg: #18f38d;
+  --cor-status-texto: #00e676;
+  --cor-status-ag-bg: #fff59d22;
+  --cor-status-ag-texto: #ffeb3b;
+  --cor-roxo: #282729;
+}
+
+body.claro {
+  --cor-sidebar-fundo:  #a259ff;
+  --cor-titulo-lateral: #e8e4ec;
+  --cor-texto: #531470;
+  --cor-borda: #d4c3f5;
+  --cor-status-bg: #18f38d;
+  --cor-status-texto: #007f4e;
+  --cor-status-ag-bg: #fff59d;
+  --cor-status-ag-texto: #8a7300;
+  --cor-roxo: #8f4de9;
+}
+:root {
+  --cor-card-agendamento: #292929;
+  --cor-borda-agendamento: #c4a5e7;
+}
+
+body.claro {
+  --cor-card-agendamento: #b89ae2;
+  --cor-borda-agendamento: #200e35;
+}

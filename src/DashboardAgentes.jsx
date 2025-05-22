@@ -10,7 +10,6 @@ export default function DashboardAgentes() {
   const [erro, setErro] = useState(null);
   const [agenteSelecionado, setAgenteSelecionado] = useState(null);
   const [alertasMatricula, setAlertasMatricula] = useState([]);
-  const [mostrarSidebarAlertas, setMostrarSidebarAlertas] = useState(false);
 
   useEffect(() => {
     fetch("https://api.sheetbest.com/sheets/f6d72757-6186-4c31-a811-3295c2e79eeb/tabs/Onboarding%20Maio")
@@ -88,31 +87,30 @@ export default function DashboardAgentes() {
       });
   }, []);
 
-  const topAproveitamento = [...dados].sort((a, b) => b.pctAtiva - a.pctAtiva).slice(0, 2);
-  const topResolvidos = [...dados].sort((a, b) => b.resolvidos - a.resolvidos).slice(0, 2);
-  const topAtivos = [...dados].sort((a, b) => b.ativos - a.ativos).slice(0, 2);
+  const topAproveitamento = [...dados]
+    .sort((a, b) => parseFloat(b.pctCheia) - parseFloat(a.pctCheia))
+    .slice(0, 2);
+
+  const topResolvidos = [...dados]
+    .sort((a, b) => parseInt(b.resolvidos) - parseInt(a.resolvidos))
+    .slice(0, 2);
+
+  const topAtivos = [...dados]
+    .sort((a, b) => parseFloat(b.pctAtiva) - parseFloat(a.pctAtiva))
+    .slice(0, 2);
 
   return (
     <div className={`container ${tema === "escuro" ? "escuro" : "claro"}`}>
       <div className="header-topo">
         <h1 className="titulo">Ranking de Performance</h1>
-
-        {alertasMatricula.length > 0 && (
-          <div
-            className="alerta-botao piscar"
-            title="Alunos com 6 ou 7 dias de matrícula"
-            onClick={() => setMostrarSidebarAlertas(true)}
-          >
-            ⚠️
-          </div>
-        )}
       </div>
 
       <div className="ranking-trio-linha">
-        {/* Aproveitamento */}
+        {/* Melhor Aproveitamento */}
         <div className="bloco-ranking">
           <h2 className="ranking-titulo-grande">
-            Melhor Aproveitamento <span className="tooltip-icon" title="Porcentagem de alunos resolvidos em relação ao total da carteira — considerando todos os alunos, inclusive os inativos ou inválidos.">❔</span>
+            Melhor Aproveitamento
+            <span className="tooltip-icon" title="Porcentagem de alunos resolvidos em relação ao total da carteira — considerando todos os alunos, inclusive os inativos ou inválidos.">❔</span>
           </h2>
           <div className="ranking-dupla">
             {topAproveitamento.map((ag, i) => (
@@ -125,10 +123,11 @@ export default function DashboardAgentes() {
           </div>
         </div>
 
-        {/* Resolvidos */}
+        {/* Mais Resolvidos */}
         <div className="bloco-ranking">
           <h2 className="ranking-titulo-grande">
-            Mais Resolvidos <span className="tooltip-icon" title="Quantidade total de aulas zero realizadas.">❔</span>
+            Mais Resolvidos
+            <span className="tooltip-icon" title="Quantidade total de aulas zero realizadas.">❔</span>
           </h2>
           <div className="ranking-dupla">
             {topResolvidos.map((ag, i) => (
@@ -141,10 +140,11 @@ export default function DashboardAgentes() {
           </div>
         </div>
 
-        {/* Ativos */}
+        {/* Somente Ativos */}
         <div className="bloco-ranking">
           <h2 className="ranking-titulo-grande">
-            Somente Ativos <span className="tooltip-icon" title="Porcentagem de alunos resolvidos considerando apenas os ativos. Casos inválidos, inacessíveis, cancelados antes, com auditoria ou situações atípicas são desconsiderados.">❔</span>
+            Somente Ativos
+            <span className="tooltip-icon" title="Porcentagem de alunos resolvidos considerando apenas os ativos. Casos inválidos, inacessíveis, cancelados antes, com auditoria ou situações atípicas são desconsiderados.">❔</span>
           </h2>
           <div className="ranking-dupla">
             {topAtivos.map((ag, i) => (
@@ -178,25 +178,6 @@ export default function DashboardAgentes() {
           rankingGeral={dados}
         />
       )}
-
-      {mostrarSidebarAlertas && (
-        <div className="alerta-overlay" onClick={() => setMostrarSidebarAlertas(false)}>
-          <div className="alerta-sidebar" onClick={(e) => e.stopPropagation()}>
-            <button className="fechar-alerta" onClick={() => setMostrarSidebarAlertas(false)}>✖</button>
-            <h3>⚠️ Matrículas com 6 ou 7 dias</h3>
-            <ul>
-              {alertasMatricula.map((aluno, index) => (
-                <li key={index}>
-                  <strong>{aluno["ALUNO"]}</strong><br />
-                  📞 {aluno["TELEFONE"] || "Sem telefone"}<br />
-                  📅 {aluno["DATA MAT"]}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
-// ajuste forçado para redeploy final
