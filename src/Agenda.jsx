@@ -42,60 +42,87 @@ const aoClicarNoDia = (dataStr, agente) => {
 useEffect(() => {
   fetch("https://api.sheetbest.com/sheets/f6d72757-6186-4c31-a811-3295c2e79eeb/tabs/Onboarding%20Junho")
     .then((res) => res.json())
-    .then((data) => {
-      // Sanitiza os nomes das colunas
-      const normalizarChaves = (obj) =>
-        Object.fromEntries(
-          Object.entries(obj).map(([chave, valor]) => [
-            chave.trim().toLowerCase(),
-            typeof valor === "string" ? valor.trim() : valor,
-          ])
-        );
+.then((data) => {
+  console.log("DADOS DA PLANILHA", data);
 
-      const adaptado = data.map((itemOriginal) => {
-        const item = normalizarChaves(itemOriginal);
+  const normalizarChaves = (obj) =>
+    Object.fromEntries(
+      Object.entries(obj).map(([chave, valor]) => [
+        chave.trim().toLowerCase(),
+        typeof valor === "string" ? valor.trim() : valor,
+      ])
+    );
 
-        let dataRaw = typeof item["dia da aula zero"] === "string" ? item["dia da aula zero"] : "";
-        let dia = "", mes = "", ano = String(new Date().getFullYear());
-        if (dataRaw.includes("/")) {
-          const partes = dataRaw.split("/").map((p) => p.trim());
-          dia = partes[0]?.padStart(2, "0") || "";
-          mes = partes[1]?.padStart(2, "0") || "";
-          ano = partes[2]?.length === 4 ? partes[2] : ano;
-        }
-        const dataFormatada = `${dia}/${mes}/${ano}`;
+  const parseDataBR = (dataBR) => {
+    const [dia, mes] = dataBR.split('/');
+    const hoje = new Date();
+    const ano = hoje.getFullYear();
+    return new Date(`${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`);
+  };
 
-        let horarioRaw = item["horário da aula zero"]?.toString() || "";
-        if (/^\d{1,2}$/.test(horarioRaw)) {
-          horarioRaw = horarioRaw.padStart(2, "0") + ":00";
-        } else if (/^\d{1,2}h$/.test(horarioRaw)) {
-          horarioRaw = horarioRaw.replace("h", ":00").padStart(5, "0");
-        } else if (/^\d{1,2}:\d{2}$/.test(horarioRaw)) {
-          const [h, m] = horarioRaw.split(":");
-          horarioRaw = `${h.padStart(2, "0")}:${m}`;
-        }
+  const estaNaSemana = (dataTexto) => {
+    if (!dataTexto) return false;
+    const data = parseDataBR(dataTexto);
+    const hoje = new Date();
+    const diaSemana = hoje.getDay();
+    const inicio = new Date(hoje);
+    inicio.setDate(hoje.getDate() - diaSemana + 1);
+    const fim = new Date(inicio);
+    fim.setDate(inicio.getDate() + 6);
+    data.setHours(0, 0, 0, 0);
+    inicio.setHours(0, 0, 0, 0);
+    fim.setHours(0, 0, 0, 0);
+    return data >= inicio && data <= fim;
+  };
 
-        return {
-          nome: item["aluno"],
-          telefone: item["telefone"],
-          dia: dataFormatada,
-          horario: horarioRaw,
-          status: item["status"],
-          agente: item["agente"],
-          comercial: item["comercial"],
-          dataMatricula: item["data mat"],
-          email: item["email"],
-          inicioAulas: item["inicio aulas"],
-        };
-      });
+  const adaptado = data.map((itemOriginal) => {
+    const item = normalizarChaves(itemOriginal);
 
-      setAgendamentos(adaptado);
-      setErroFetch(null);
-    })
-    .catch((err) => {
-      console.error("Erro ao buscar dados:", err);
-      setErroFetch("Não foi possível carregar os dados da agenda. Tente atualizar a página.");
-    });
+    const raw = typeof item["dia da aula zero"] === "string" ? item["dia da aula zero"] : "";
+    const partes = raw.split("/").map((v) => v.trim());
+    const dia = partes[0]?.padStart(2, "0") || "";
+    const mes = partes[1]?.padStart(2, "0") || "";
+    const ano = partes[2]?.length === 4 ? partes[2] : String(new Date().getFullYear());
+    const dataFormatada = `${dia}/${mes}/${ano}`;
+
+    let horarioRaw = item["horário da aula zero"]?.toString() || "";
+    if (/^\d{1,2}$/.test(horarioRaw)) {
+      horarioRaw = horarioRaw.padStart(2, "0") + ":00";
+    } else if (/^\d{1,2}h$/.test(horarioRaw)) {
+      horarioRaw = horarioRaw.replace("h", ":00").padStart(5, "0");
+    } else if (/^\d{1,2}:\d{2}$/.test(horarioRaw)) {
+      const [h, m] = horarioRaw.split(":");
+      horarioRaw = `${h.padStart(2, "0")}:${m}`;
+    }
+
+    return {
+      nome: item["aluno"],
+      telefone: item["telefone"],
+      dia: dataFormatada,
+      horario: horarioRaw,
+      status: item["status"],
+      agente: item["agente"],
+      comercial: item["comercial"],
+      dataMatricula: item["data mat"],
+      email: item["email"],
+      inicioAulas: item["inicio aulas"],
+    };
+  });
+
+  const somenteDaSemana = adaptado.filter((a) => {
+    return (
+      ["agendado", "resolvido"].includes(a.status?.toLowerCase()) &&
+      estaNaSemana(a.dia)
+    );
+  });
+
+  setAgendamentos(somenteDaSemana);
+  setErroFetch(null);
+})
+.catch((err) => {
+  console.error("Erro ao buscar dados:", err);
+  setErroFetch("Não foi possível carregar os dados da agenda. Tente atualizar a página.");
+});
 }, []);
 
   const gerarHorarios = () => {
