@@ -53,12 +53,12 @@ useEffect(() => {
       ])
     );
 
-  const parseDataBR = (dataBR) => {
-    const [dia, mes] = dataBR.split('/');
-    const hoje = new Date();
-    const ano = hoje.getFullYear();
-    return new Date(`${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`);
-  };
+const parseDataBR = (dataBR) => {
+  const [dia, mes] = dataBR.split('/');
+  const hoje = new Date();
+  const ano = hoje.getFullYear();
+  return new Date(`${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`);
+};
 
   const estaNaSemana = (dataTexto) => {
     if (!dataTexto) return false;
@@ -157,22 +157,34 @@ useEffect(() => {
     return matchStatus && matchDia && matchAgente && (termoBusca ? matchBusca : true);
   });
 
-  const agendamentosPorAgente = {};
-  todosAgentesOrdenados.forEach((agente) => {
-    agendamentosPorAgente[agente] = agendamentos.filter((item) => {
-      const pertenceAoAgente = item.agente === agente;
-      const matchDia =
-        filtroDia === "Todos" ||
-        (filtroDia === "Hoje" && item.dia === hojeBR) ||
-        (filtroDia === "Data" && item.dia === dataSelecionada);
-      const matchStatus =
-        filtroDia === "Todos"
-          ? item.status === "agendado"
-          : ["agendado", "resolvido"].includes(item.status);
-      const matchBusca = item.nome ? item.nome.toLowerCase().includes(termoBusca) : false;
-      return pertenceAoAgente && matchDia && matchStatus && (termoBusca ? matchBusca : true);
-    }).sort((a, b) => (a.horario || "").localeCompare(b.horario || ""));
-  });
+const agendamentosPorAgente = {};
+todosAgentesOrdenados.forEach((agente) => {
+  agendamentosPorAgente[agente] = agendamentos.filter((item) => {
+    const pertenceAoAgente = item.agente === agente;
+
+    const matchSemana = visao === "semana" ? estaNaSemana(item.dia) : true;
+
+    const matchDia =
+      filtroDia === "Todos" ||
+      (filtroDia === "Hoje" && item.dia === hojeBR) ||
+      (filtroDia === "Data" && item.dia === dataSelecionada);
+
+    const matchStatus =
+      filtroDia === "Todos"
+        ? item.status === "agendado"
+        : ["agendado", "resolvido"].includes(item.status);
+
+    const matchBusca = item.nome ? item.nome.toLowerCase().includes(termoBusca) : false;
+
+    return (
+      pertenceAoAgente &&
+      matchSemana &&
+      matchDia &&
+      matchStatus &&
+      (termoBusca ? matchBusca : true)
+    );
+  }).sort((a, b) => (a.horario || "").localeCompare(b.horario || ""));
+});
 
 const horariosDoDia = gerarHorarios();
 
