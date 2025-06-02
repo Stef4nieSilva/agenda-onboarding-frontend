@@ -23,12 +23,40 @@ export default function Agenda() {
   });
 
   const [diaMensalSelecionado, setDiaMensalSelecionado] = useState(null);
-const [agenteMensalSelecionado, setAgenteMensalSelecionado] = useState(null);
+  const [agenteMensalSelecionado, setAgenteMensalSelecionado] = useState(null);
 
-const aoClicarNoDia = (dataStr, agente) => {
-  setDiaMensalSelecionado(dataStr);
-  setAgenteMensalSelecionado(agente);
-};
+  // ─── Helpers para manipular datas ────────────────────────────────────
+  // Converte "dd/mm" em um objeto Date (utilizando o ano atual)
+  const parseDataBR = (dataBR) => {
+    const [dia, mes] = dataBR.split("/");
+    const hoje = new Date();
+    const ano = hoje.getFullYear();
+    return new Date(`${ano}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`);
+  };
+
+  // Retorna true se "dd/mm" estiver dentro da semana atual (segunda a domingo)
+  const estaNaSemana = (dataTexto) => {
+    if (!dataTexto) return false;
+    const data = parseDataBR(dataTexto);
+
+    const hoje = new Date();
+    const diaSemana = hoje.getDay(); // 0 = domingo, 1 = segunda, ...
+    const inicio = new Date(hoje);
+    inicio.setDate(hoje.getDate() - diaSemana + 1);
+    const fim = new Date(inicio);
+    fim.setDate(inicio.getDate() + 6);
+
+    data.setHours(0, 0, 0, 0);
+    inicio.setHours(0, 0, 0, 0);
+    fim.setHours(0, 0, 0, 0);
+
+    return data >= inicio && data <= fim;
+  };
+
+  const aoClicarNoDia = (dataStr, agente) => {
+    setDiaMensalSelecionado(dataStr);
+    setAgenteMensalSelecionado(agente);
+  };
 
   useEffect(() => {
     localStorage.setItem("ausencias", JSON.stringify(ausencias));
@@ -39,64 +67,76 @@ const aoClicarNoDia = (dataStr, agente) => {
     hoje.getMonth() + 1
   ).padStart(2, "0")}/${hoje.getFullYear()}`;
 
-useEffect(() => {
-  fetch("https://api.sheetbest.com/sheets/f6d72757-6186-4c31-a811-3295c2e79eeb/tabs/Onboarding%20Junho")
-    .then((res) => res.json())
-    .then((data) => {
-      // Sanitiza os nomes das colunas
-      const normalizarChaves = (obj) =>
-        Object.fromEntries(
-          Object.entries(obj).map(([chave, valor]) => [
-            chave.trim().toLowerCase(),
-            typeof valor === "string" ? valor.trim() : valor,
-          ])
+  useEffect(() => {
+    fetch(
+      "https://api.sheetbest.com/sheets/f6d72757-6186-4c31-a811-3295c2e79eeb/tabs/Onboarding%20Junho"
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        // **Aqui NÃO deve haver parseDataBR nem estaNaSemana** — já estão no topo.
+
+        // Sanitiza os nomes das colunas (“ ALUNO ” → “aluno”, remove espaços)
+        const normalizarChaves = (obj) =>
+          Object.fromEntries(
+            Object.entries(obj).map(([chave, valor]) => [
+              chave.trim().toLowerCase(),
+              typeof valor === "string" ? valor.trim() : valor,
+            ])
+          );
+
+        // Mapeia cada item para o formato do app
+        const adaptado = data.map((itemOriginal) => {
+          const item = normalizarChaves(itemOriginal);
+
+          // Monta “dia” como dd/mm/aaaa
+          const raw =
+            typeof item["dia da aula zero"] === "string"
+              ? item["dia da aula zero"]
+              : "";
+          const partes = raw.split("/").map((p) => p.trim());
+          let dia = partes[0]?.padStart(2, "0") || "";
+          let mes = partes[1]?.padStart(2, "0") || "";
+          let ano =
+            partes[2]?.length === 4
+              ? partes[2]
+              : String(new Date().getFullYear());
+          const dataFormatada = `${dia}/${mes}/${ano}`;
+
+          // Formata horário (“9” → “09:00”, “9h” → “09:00”, “9:30” → “09:30”)
+          let horarioRaw = item["horário da aula zero"]?.toString() || "";
+          if (/^\d{1,2}$/.test(horarioRaw)) {
+            horarioRaw = horarioRaw.padStart(2, "0") + ":00";
+          } else if (/^\d{1,2}h$/.test(horarioRaw)) {
+            horarioRaw = horarioRaw.replace("h", ":00").padStart(5, "0");
+          } else if (/^\d{1,2}:\d{2}$/.test(horarioRaw)) {
+            const [h, m] = horarioRaw.split(":");
+            horarioRaw = `${h.padStart(2, "0")}:${m}`;
+          }
+
+          return {
+            nome: item["aluno"],
+            telefone: item["telefone"],
+            dia: dataFormatada,
+            horario: horarioRaw,
+            status: item["status"],
+            agente: item["agente"],
+            comercial: item["comercial"],
+            dataMatricula: item["data mat"],
+            email: item["email"],
+            inicioAulas: item["inicio aulas"],
+          };
+        });
+
+        setAgendamentos(adaptado);
+        setErroFetch(null);
+      })
+      .catch((err) => {
+        console.error("Erro ao buscar dados:", err);
+        setErroFetch(
+          "Não foi possível carregar os dados da agenda. Tente atualizar a página."
         );
-
-      const adaptado = data.map((itemOriginal) => {
-        const item = normalizarChaves(itemOriginal);
-
-        let dataRaw = typeof item["dia da aula zero"] === "string" ? item["dia da aula zero"] : "";
-        let dia = "", mes = "", ano = String(new Date().getFullYear());
-        if (dataRaw.includes("/")) {
-          const partes = dataRaw.split("/").map((p) => p.trim());
-          dia = partes[0]?.padStart(2, "0") || "";
-          mes = partes[1]?.padStart(2, "0") || "";
-          ano = partes[2]?.length === 4 ? partes[2] : ano;
-        }
-        const dataFormatada = `${dia}/${mes}/${ano}`;
-
-        let horarioRaw = item["horário da aula zero"]?.toString() || "";
-        if (/^\d{1,2}$/.test(horarioRaw)) {
-          horarioRaw = horarioRaw.padStart(2, "0") + ":00";
-        } else if (/^\d{1,2}h$/.test(horarioRaw)) {
-          horarioRaw = horarioRaw.replace("h", ":00").padStart(5, "0");
-        } else if (/^\d{1,2}:\d{2}$/.test(horarioRaw)) {
-          const [h, m] = horarioRaw.split(":");
-          horarioRaw = `${h.padStart(2, "0")}:${m}`;
-        }
-
-        return {
-          nome: item["aluno"],
-          telefone: item["telefone"],
-          dia: dataFormatada,
-          horario: horarioRaw,
-          status: item["status"],
-          agente: item["agente"],
-          comercial: item["comercial"],
-          dataMatricula: item["data mat"],
-          email: item["email"],
-          inicioAulas: item["inicio aulas"],
-        };
       });
-
-      setAgendamentos(adaptado);
-      setErroFetch(null);
-    })
-    .catch((err) => {
-      console.error("Erro ao buscar dados:", err);
-      setErroFetch("Não foi possível carregar os dados da agenda. Tente atualizar a página.");
-    });
-}, []);
+  }, []);
 
   const gerarHorarios = () => {
     const base = new Set();
@@ -130,23 +170,45 @@ useEffect(() => {
     return matchStatus && matchDia && matchAgente && (termoBusca ? matchBusca : true);
   });
 
-  const agendamentosPorAgente = {};
-  todosAgentesOrdenados.forEach((agente) => {
-    agendamentosPorAgente[agente] = agendamentos.filter((item) => {
+const agendamentosPorAgente = {};
+todosAgentesOrdenados.forEach((agente) => {
+  agendamentosPorAgente[agente] = agendamentos
+    .filter((item) => {
       const pertenceAoAgente = item.agente === agente;
+
+      // 1) Filtro por semana: só aplica estaNaSemana(item.dia) se visao === "semana"
+      const matchSemana = visao === "semana" ? estaNaSemana(item.dia) : true;
+
+      // 2) Filtro por dia conforme filtroDia (“Todos”, “Hoje” ou data específica)
       const matchDia =
         filtroDia === "Todos" ||
         (filtroDia === "Hoje" && item.dia === hojeBR) ||
         (filtroDia === "Data" && item.dia === dataSelecionada);
+
+      // 3) Filtro por status (se filtroDia === “Todos” só pega “agendado”, senão também “resolvido”)
       const matchStatus =
         filtroDia === "Todos"
           ? item.status === "agendado"
           : ["agendado", "resolvido"].includes(item.status);
-      const matchBusca = item.nome ? item.nome.toLowerCase().includes(termoBusca) : false;
-      return pertenceAoAgente && matchDia && matchStatus && (termoBusca ? matchBusca : true);
-    }).sort((a, b) => (a.horario || "").localeCompare(b.horario || ""));
-  });
 
+      // 4) Filtro de busca pelo nome
+      const matchBusca = item.nome
+        ? item.nome.toLowerCase().includes(termoBusca)
+        : false;
+
+      // Retorna true só se passar todos os filtros
+      return (
+        pertenceAoAgente &&
+        matchSemana &&
+        matchDia &&
+        matchStatus &&
+        (termoBusca ? matchBusca : true)
+      );
+    })
+    .sort((a, b) => (a.horario || "").localeCompare(b.horario || ""));
+});
+
+// A seguir, gera a lista de horários do dia (para GradeHorariosDia)
 const horariosDoDia = gerarHorarios();
 
 return (
