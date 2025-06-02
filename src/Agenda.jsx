@@ -40,7 +40,7 @@ const aoClicarNoDia = (dataStr, agente) => {
   ).padStart(2, "0")}/${hoje.getFullYear()}`;
 
 useEffect(() => {
-  fetch("https://api.sheetbest.com/sheets/f6d72757-6186-4c31-a811-3295c2e79eeb/tabs/Onboarding%20Maio")
+  fetch("https://api.sheetbest.com/sheets/f6d72757-6186-4c31-a811-3295c2e79eeb/tabs/Onboarding%20Junho")
     .then((res) => res.json())
     .then((data) => {
       // Sanitiza os nomes das colunas
