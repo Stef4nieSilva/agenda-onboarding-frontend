@@ -40,7 +40,9 @@ export default function DashboardAgentes() {
           const agente = item["AGENTE"]?.trim();
           const status = item["STATUS"]?.trim().toLowerCase();
           const foto = `/fotos/${agente}.jpg`;
-          if (!agente || !status) return;
+const email = item["EMAIL"]?.trim();
+if (!agente || !email) return;
+
 
           if (!agrupado[agente]) {
             agrupado[agente] = {
