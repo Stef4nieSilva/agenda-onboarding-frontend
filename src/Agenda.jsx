@@ -370,24 +370,23 @@ export default function Agenda() {
               />
             </label>
 
-            <label>
-              Fim do Atendimento:
-              <input
-                type="time"
-                onChange={(e) => {
-                  const fimExpediente = e.target.value;
-                  setAusencias((prev) => ({
-                    ...prev,
-                    [agenteSelecionado]: {
-                      ...prev[agenteSelecionado],
-                      fimExpediente,
-                    },
-                  }));
-                }}
-                value={ausencias[agenteSelecionado]?.fimExpediente || ""}
-              />
-            />
-            </label>
+ <label>
+  Fim do Atendimento:
+  <input
+    type="time"
+    onChange={(e) => {
+      const fimExpediente = e.target.value;
+      setAusencias((prev) => ({
+        ...prev,
+        [agenteSelecionado]: {
+          ...prev[agenteSelecionado],
+          fimExpediente,
+        },
+      }));
+    }}
+    value={ausencias[agenteSelecionado]?.fimExpediente || ""}
+  />
+</label>
           </div>
         )}
       </div>
