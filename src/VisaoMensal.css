@@ -89,3 +89,28 @@ body.claro {
   --cor-roxo-hover: #7c2fbb;
   --cor-sombra-card: rgba(167, 85, 223, 0.2);
 }
+@media (max-width: 600px) {
+  .grade-mensal {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .bloco-dia {
+    height: auto;
+    padding: 10px;
+  }
+
+  .cabecalho-dia {
+    font-size: 13px;
+  }
+
+  .foto-agente-mini {
+    width: 28px;
+    height: 28px;
+  }
+
+  .rodape-total {
+    font-size: 11px;
+  }
+}

@@ -618,3 +618,74 @@
   font-weight: 600;
   color: #6639a1;
 }
+@media screen and (max-width: 600px) {
+  .dashboard-agentes-container,
+  .ranking-cards-container,
+  .bloco-ranking-completo,
+  .ranking-trio-linha {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .agente-card,
+  .ranking-card,
+  .flip-card,
+  .bloco-ranking,
+  .card-individual-ranking,
+  .bloco-metrica {
+    width: 90% !important;
+    max-width: 320px;
+  }
+
+  .titulo {
+    font-size: 28px;
+    margin: 20px 0;
+  }
+
+  .ranking-titulo-grande {
+    font-size: 20px;
+  }
+
+  .flip-card {
+    height: 300px;
+  }
+
+  .flip-inner {
+    height: 100%;
+  }
+
+  .sidebar-conteudo {
+    width: 100%;
+    padding: 16px;
+  }
+
+  .botao-pdf {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .blocos-metricas-container {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .alerta-matricula-container {
+    width: 95%;
+    font-size: 14px;
+  }
+
+  .ranking-avatar {
+    width: 50px;
+    height: 50px;
+  }
+
+  .ranking-valor {
+    font-size: 1.2rem;
+  }
+
+  .ranking-trofeu {
+    font-size: 18px;
+    padding: 4px;
+  }
+}

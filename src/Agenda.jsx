@@ -36,24 +36,27 @@ export default function Agenda() {
   };
 
   // Retorna true se "dd/mm/aaaa" estiver dentro da semana atual (segunda a domingo)
-  const estaNaSemana = (dataTexto) => {
-    if (!dataTexto) return false;
-    const data = parseDataBR(dataTexto);
-    if (!data || isNaN(data.getTime())) return false;
+const estaNaSemana = (dataTexto) => {
+  const data = parseDataBR(dataTexto);
+  if (!data || isNaN(data)) return false;
 
-    const hoje = new Date();
-    const diaSemana = hoje.getDay(); // 0 = domingo, 1 = segunda, ...
-    const inicio = new Date(hoje);
-    inicio.setDate(hoje.getDate() - diaSemana + 1); // define segunda
-    const fim = new Date(inicio);
-    fim.setDate(inicio.getDate() + 6); // define domingo
+  const hoje = new Date();
+  const diaSemana = hoje.getDay(); // 0 (domingo) a 6 (sábado)
+  const diferencaSegunda = diaSemana === 0 ? -6 : 1 - diaSemana;
 
-    data.setHours(0, 0, 0, 0);
-    inicio.setHours(0, 0, 0, 0);
-    fim.setHours(0, 0, 0, 0);
+  const inicioSemana = new Date(hoje);
+  inicioSemana.setDate(hoje.getDate() + diferencaSegunda);
 
-    return data >= inicio && data <= fim;
-  };
+  const fimSemana = new Date(inicioSemana);
+  fimSemana.setDate(inicioSemana.getDate() + 6);
+
+  // normaliza horários
+  data.setHours(0, 0, 0, 0);
+  inicioSemana.setHours(0, 0, 0, 0);
+  fimSemana.setHours(0, 0, 0, 0);
+
+  return data >= inicioSemana && data <= fimSemana;
+};
 
   const aoClicarNoDia = (dataStr, agente) => {
     setDiaMensalSelecionado(dataStr);
@@ -64,10 +67,10 @@ export default function Agenda() {
     localStorage.setItem("ausencias", JSON.stringify(ausencias));
   }, [ausencias]);
 
-  const hoje = new Date();
-  const hojeBR = `${String(hoje.getDate()).padStart(2, "0")}/${String(
-    hoje.getMonth() + 1
-  ).padStart(2, "0")}/${hoje.getFullYear()}`;
+const hoje = new Date();
+const hojeBR = `${String(hoje.getDate()).padStart(2, "0")}/${String(
+  hoje.getMonth() + 1
+).padStart(2, "0")}/${hoje.getFullYear()}`;
 
   // ─── Fetch + normalização do status em minúsculas ───────────────────
   useEffect(() => {
@@ -127,6 +130,8 @@ export default function Agenda() {
 
         setAgendamentos(adaptado);
         setErroFetch(null);
+        console.log("TOTAL DE AGENDAMENTOS:", adaptado.length);
+console.log("TODOS OS DIAS:", adaptado.map(a => a.dia));
       })
       .catch((err) => {
         console.error("Erro ao buscar dados:", err);
@@ -137,95 +142,96 @@ export default function Agenda() {
   }, []);
 
   // ─── Geração de todos horários possíveis (9:00 até 21:30) ─────────────────
-  const gerarHorarios = () => {
-    const base = new Set();
-    for (let hora = 9; hora <= 21; hora++) {
-      for (let minuto of [0, 15, 30, 45]) {
-        if (hora === 21 && minuto > 30) break;
-        const h = String(hora).padStart(2, "0");
-        const m = String(minuto).padStart(2, "0");
-        base.add(`${h}:${m}`);
-      }
+// ─── Geração de todos horários possíveis (9:00 até 21:30) ─────────────────
+const gerarHorarios = () => {
+  const base = new Set();
+  for (let hora = 9; hora <= 21; hora++) {
+    for (let minuto of [0, 15, 30, 45]) {
+      if (hora === 21 && minuto > 30) break;
+      const h = String(hora).padStart(2, "0");
+      const m = String(minuto).padStart(2, "0");
+      base.add(`${h}:${m}`);
     }
-    agendamentos.forEach((a) => {
-      if (a.horario) {
-        const [h, m] = a.horario.split(":");
-        const horarioNormalizado = `${h.padStart(2, "0")}:${m.padStart(2, "0")}`;
-        base.add(horarioNormalizado);
-      }
-    });
-    return Array.from(base).sort((a, b) => a.localeCompare(b));
-  };
-
-  const todosAgentesOrdenados = ["Anny", "Diego", "Stefanie", "Vanessa"];
-  const agentesFiltrados =
-    agenteSelecionado === "Todos" ? todosAgentesOrdenados : [agenteSelecionado];
-  const diaParaFiltrar =
-    filtroDia === "Hoje"
-      ? hojeBR
-      : filtroDia === "Data"
-      ? dataSelecionada
-      : null;
-
-  // ─── Filtro principal para a visão diária (GradeHorariosDia) ─────────────────
-  const agendamentosFiltradosDia = agendamentos.filter((item) => {
-    // status “agendado” ou “resolvido”
-    const matchStatus = ["agendado", "resolvido"].includes(item.status);
-    // filtra pelo dia específico (hoje, data ou todos)
-    const matchDia = diaParaFiltrar ? item.dia === diaParaFiltrar : true;
-    // filtra pelo agente (se não for “Todos”)
-    const matchAgente =
-      agenteSelecionado === "Todos" || item.agente === agenteSelecionado;
-    // filtra pelo termo de busca no nome
-    const matchBusca = item.nome
-      ? item.nome.toLowerCase().includes(termoBusca)
-      : false;
-    return matchStatus && matchDia && matchAgente && (termoBusca ? matchBusca : true);
+  }
+  agendamentos.forEach((a) => {
+    if (a.horario) {
+      const [h, m] = a.horario.split(":");
+      const horarioNormalizado = `${h.padStart(2, "0")}:${m.padStart(2, "0")}`;
+      base.add(horarioNormalizado);
+    }
   });
+  return Array.from(base).sort((a, b) => a.localeCompare(b));
+};
 
-  // ─── Filtro para a visão semanal (GradeAgentes) ───────────────────────────────
-  const agendamentosPorAgente = {};
-  todosAgentesOrdenados.forEach((agente) => {
-    agendamentosPorAgente[agente] = agendamentos
-      .filter((item) => {
-        const pertenceAoAgente = item.agente === agente;
+const todosAgentesOrdenados = ["Anny", "Diego", "Stefanie", "Vanessa"];
+const agentesFiltrados =
+  agenteSelecionado === "Todos" ? todosAgentesOrdenados : [agenteSelecionado];
 
-        // 1) Se for “semana”, inclua tanto “agendado” quanto “resolvido”
-        let matchStatus;
-        if (visao === "semana") {
-          matchStatus = ["agendado", "resolvido"].includes(item.status);
-        } else {
-          // senão, se filtroDia for “Todos”, só “agendado”; caso contrário (Hoje/Data), “agendado” ou “resolvido”
-          matchStatus =
-            filtroDia === "Todos"
-              ? item.status === "agendado"
-              : ["agendado", "resolvido"].includes(item.status);
-        }
+// ─── Filtro principal para a visão diária (GradeHorariosDia) ─────────────────
+const agendamentosFiltradosDia = agendamentos.filter((item) => {
+  const statusNormalizado = item.status?.toString().trim().toLowerCase() || "";
+  const diaItem = item.dia?.toString().trim();
+  const matchAgente = agenteSelecionado === "Todos" || item.agente === agenteSelecionado;
+  const matchBusca = item.nome?.toLowerCase().includes(termoBusca) || false;
 
-        // 2) Se for “semana”, verifica se a data está na semana atual
-        const matchSemana = visao === "semana" ? estaNaSemana(item.dia) : true;
+  const statusAceitosHoje = ["agendado", "resolvido", "andamento"];
+  const statusAceitosData = ["agendado", "resolvido", "andamento"];
 
-        // 3) Filtra conforme filtroDia (Hoje, Todos ou Data)
-        const matchDia =
-          filtroDia === "Todos" ||
-          (filtroDia === "Hoje" && item.dia === hojeBR) ||
-          (filtroDia === "Data" && item.dia === dataSelecionada);
+  let matchStatus = false;
+  let matchDia = false;
 
-        // 4) Filtro de busca pelo nome
-        const matchBusca = item.nome
-          ? item.nome.toLowerCase().includes(termoBusca)
+  if (filtroDia === "Hoje") {
+    matchDia = diaItem === hojeBR;
+    matchStatus = statusAceitosHoje.includes(statusNormalizado);
+  } else if (filtroDia === "Todos") {
+    matchDia = true;
+    matchStatus = statusNormalizado === "agendado";
+  } else if (filtroDia === "Data") {
+    matchDia = diaItem === dataSelecionada;
+    matchStatus = statusAceitosData.includes(statusNormalizado);
+  }
+
+  console.log("Comparando datas:", diaItem, "===", hojeBR);
+
+  return (
+    matchAgente &&
+    matchDia &&
+    matchStatus &&
+    (termoBusca ? matchBusca : true)
+  );
+});
+
+
+// ─── Filtro para a visão semanal (GradeAgentes) ───────────────────────────────
+const agendamentosPorAgente = {};
+todosAgentesOrdenados.forEach((agente) => {
+  agendamentosPorAgente[agente] = agendamentos
+    .filter((item) => {
+      const pertenceAoAgente = item.agente === agente;
+      const statusNormalizado = item.status?.toString().trim().toLowerCase() || "";
+      const diaItem = item.dia?.toString().trim();
+
+      // Regras por filtro de dia + status
+      const mostrar =
+        filtroDia === "Hoje"
+          ? diaItem === hojeBR && ["agendado", "resolvido"].includes(statusNormalizado)
+          : filtroDia === "Todos"
+          ? statusNormalizado === "agendado"
+          : filtroDia === "Data"
+          ? diaItem === dataSelecionada && ["agendado", "resolvido"].includes(statusNormalizado)
           : false;
 
-        return (
-          pertenceAoAgente &&
-          matchSemana &&
-          matchDia &&
-          matchStatus &&
-          (termoBusca ? matchBusca : true)
-        );
-      })
-      .sort((a, b) => (a.horario || "").localeCompare(b.horario || ""));
-  });
+      const matchBusca = item.nome?.toLowerCase().includes(termoBusca) || false;
+
+      return (
+        pertenceAoAgente &&
+        mostrar &&
+        (termoBusca ? matchBusca : true)
+      );
+    })
+    .sort((a, b) => (a.horario || "").localeCompare(b.horario || ""));
+});
+
 
   const horariosDoDia = gerarHorarios();
 
@@ -309,21 +315,22 @@ export default function Agenda() {
         </div>
       </div>
 
-      <div className="toggle-visao">
-        <button
-          className={visao === "dia" ? "ativo" : ""}
-          onClick={() => setVisao("dia")}
-          aria-pressed={visao === "dia"}
-        >
-          Visualizar por Dia
-        </button>
-        <button
-          className={visao === "semana" ? "ativo" : ""}
-          onClick={() => setVisao("semana")}
-          aria-pressed={visao === "semana"}
-        >
-          Visualizar por Semana
-        </button>
+ <div className="toggle-visao">
+  <button
+    className={visao === "dia" ? "ativo" : ""}
+    onClick={() => setVisao("dia")}
+    aria-pressed={visao === "dia"}
+  >
+    Visualizar por Dia
+  </button>
+  <button
+    className={visao === "semana" ? "ativo" : ""}
+    onClick={() => setVisao("semana")}
+    aria-pressed={visao === "semana"}
+  >
+    Visualizar por Semana
+  </button>
+
 
         {visao === "dia" && agenteSelecionado !== "Todos" && (
           <div className="controle-ausencia">

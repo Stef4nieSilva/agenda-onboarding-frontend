@@ -72,3 +72,24 @@
 .container.escuro .progressbar-percentage {
   color: #ECECF1;
 }
+@media screen and (max-width: 600px) {
+  .progressbar-container {
+    width: 90%;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+
+  .progressbar-labels {
+    font-size: 0.8rem;
+    margin-bottom: 6px;
+  }
+
+  .progressbar {
+    height: 18px;
+  }
+
+  .progressbar-percentage {
+    font-size: 1rem;
+    margin-top: 4px;
+  }
+}

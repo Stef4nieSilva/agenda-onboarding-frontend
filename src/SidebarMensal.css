@@ -139,3 +139,31 @@ body.claro {
   --cor-card-agendamento: #b89ae2;
   --cor-borda-agendamento: #200e35;
 }
+@media (max-width: 600px) {
+  .sidebar-mensal h2 {
+    font-size: 16px;
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+  }
+
+  .item-agendamento {
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .item-agendamento p {
+    font-size: 12px;
+  }
+
+  .status-resolvido,
+  .status-agendado {
+    font-size: 12px;
+    padding: 3px 6px;
+  }
+
+  .botao-fechar {
+    font-size: 14px;
+    padding: 8px 12px;
+    margin-top: 16px;
+  }
+}

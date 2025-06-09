@@ -50,3 +50,31 @@
   margin-top: 3px;
   text-align: center;
 }
+@media screen and (max-width: 600px) {
+  .gauge-card {
+    width: 80px;
+    margin: 8px;
+  }
+
+  .gauge-semi {
+    width: 70px;
+    height: 35px;
+  }
+
+  .gauge-cover {
+    width: 80%;
+    height: 80%;
+    border-top-left-radius: 70px;
+    border-top-right-radius: 70px;
+    top: 10%;
+    left: 10%;
+  }
+
+  .gauge-porcentagem {
+    font-size: 14px;
+  }
+
+  .gauge-titulo {
+    font-size: 12px;
+  }
+}
