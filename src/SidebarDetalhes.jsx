@@ -67,7 +67,7 @@ export default function SidebarDetalhes({ agente, onClose, rankingGeral }) {
     }
   }, [agente, rankingGeral]);
 
-  const faltandoMeta = Math.max(0, 95 - parseFloat(agente.pctAtiva)).toFixed(2);
+  const faltandoMeta = Math.max(0, 97 - parseFloat(agente.pctAtiva)).toFixed(2);
 
   const dataPizza = Object.entries(agente.statusDetalhado).map(([status, valor]) => ({
     name: status,
