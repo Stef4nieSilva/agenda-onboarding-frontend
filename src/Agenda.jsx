@@ -75,7 +75,7 @@ const hojeBR = `${String(hoje.getDate()).padStart(2, "0")}/${String(
   // ─── Fetch + normalização do status em minúsculas ───────────────────
   useEffect(() => {
     fetch(
-      "https://api.sheetbest.com/sheets/f6d72757-6186-4c31-a811-3295c2e79eeb/tabs/Onboarding%20Junho"
+      "https://api.sheetbest.com/sheets/5978cb41-10b0-460d-890f-809b6e1cb10c/tabs/Onboarding%20Julho"
     )
       .then((res) => res.json())
       .then((data) => {
