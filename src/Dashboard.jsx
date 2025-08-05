@@ -16,7 +16,7 @@ export default function Dashboard() {
   const [comerciaisComProblemas, setComerciaisComProblemas] = useState([]);
 
   useEffect(() => {
-    fetch("https://api.sheetbest.com/sheets/5978cb41-10b0-460d-890f-809b6e1cb10c/tabs/Onboarding%20Julho")
+    fetch("https://api.sheetbest.com/sheets/5978cb41-10b0-460d-890f-809b6e1cb10c/tabs/Onboarding%Agosto")
       .then((res) => res.json())
       .then((data) => {
         const adaptado = data.map((item) => ({
