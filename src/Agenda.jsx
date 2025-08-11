@@ -6,6 +6,22 @@ import { useTheme } from "./ThemeContext";
 import VisaoMensal from "./VisaoMensal";
 import SidebarMensal from "./SidebarMensal";
 
+// ======= Funções simples para comparar datas dd/mm/aaaa =======
+const parseDataBR = (s) => {
+  s = (s ?? '').toString().trim();
+  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!m) return null;
+  const d = new Date(+m[3], +m[2]-1, +m[1]);
+  // garante que 32/13/2025 não passe
+  return (d.getFullYear()===+m[3] && d.getMonth()===(+m[2]-1) && d.getDate()===+m[1]) ? d : null;
+};
+
+const mesmaData = (a, b) => {
+  const A = parseDataBR(a);
+  const B = parseDataBR(b);
+  return !!(A && B && A.toDateString() === B.toDateString());
+};
+
 export default function Agenda() {
   const { tema } = useTheme();
 
@@ -26,15 +42,6 @@ export default function Agenda() {
   const [agenteMensalSelecionado, setAgenteMensalSelecionado] = useState(null);
 
   // ─── Helpers para manipular datas ────────────────────────────────────
-
-  // Converte "dd/mm/aaaa" num objeto Date
-  const parseDataBR = (dataBR) => {
-    const partes = dataBR.split("/");
-    if (partes.length < 3) return null;
-    const [dia, mes, ano] = partes.map((p) => p.trim());
-    return new Date(`${ano}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`);
-  };
-
   // Retorna true se "dd/mm/aaaa" estiver dentro da semana atual (segunda a domingo)
 const estaNaSemana = (dataTexto) => {
   const data = parseDataBR(dataTexto);
@@ -73,13 +80,13 @@ const hojeBR = `${String(hoje.getDate()).padStart(2, "0")}/${String(
 ).padStart(2, "0")}/${hoje.getFullYear()}`;
 
   // ─── Fetch + normalização do status em minúsculas ───────────────────
-  useEffect(() => {
-    fetch(
-      "https://api.sheetbest.com/sheets/8f37dd26-1205-442d-b42e-d4a54e898d3f/tabs/Onboarding%20Agosto"
-
-    )
-      .then((res) => res.json())
-      .then((data) => {
+// ─── Fetch + normalização do status em minúsculas ───────────────────
+useEffect(() => {
+  fetch(
+    "https://api.sheetbest.com/sheets/8f37dd26-1205-442d-b42e-d4a54e898d3f/tabs/Onboarding%20Agosto"
+  )
+    .then((res) => res.json())
+    .then((data) => {
         // Função que normaliza chaves (remove espaços e deixa tudo em lowercase)
         const normalizarChaves = (obj) =>
           Object.fromEntries(
@@ -103,16 +110,18 @@ const hojeBR = `${String(hoje.getDate()).padStart(2, "0")}/${String(
               : String(new Date().getFullYear());
           const dataFormatada = `${dia}/${mes}/${ano}`;
 
-          // Formata horário (“9” → “09:00”, “9h” → “09:00”, “9:30” → “09:30”)
-          let horarioRaw = item["horário da aula zero"]?.toString() || "";
-          if (/^\d{1,2}$/.test(horarioRaw)) {
-            horarioRaw = horarioRaw.padStart(2, "0") + ":00";
-          } else if (/^\d{1,2}h$/.test(horarioRaw)) {
-            horarioRaw = horarioRaw.replace("h", ":00").padStart(5, "0");
-          } else if (/^\d{1,2}:\d{2}$/.test(horarioRaw)) {
-            const [h, m] = horarioRaw.split(":");
-            horarioRaw = `${h.padStart(2, "0")}:${m}`;
-          }
+// Formata horário (“0”, "-", "", “9”, “9h”, “9:30”)
+let horarioRaw = item["horário da aula zero"]?.toString().trim() || "";
+if (horarioRaw === "0" || horarioRaw === "-") {
+  horarioRaw = ""; // sem agendamento
+} else if (/^\d{1,2}$/.test(horarioRaw)) {
+  horarioRaw = horarioRaw.padStart(2, "0") + ":00";
+} else if (/^\d{1,2}h$/.test(horarioRaw)) {
+  horarioRaw = horarioRaw.replace("h", ":00").padStart(5, "0");
+} else if (/^\d{1,2}:\d{1,2}$/.test(horarioRaw)) {
+  const [h, m = "00"] = horarioRaw.split(":");
+  horarioRaw = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
 
           return {
             nome: item["aluno"],
@@ -154,13 +163,20 @@ const gerarHorarios = () => {
       base.add(`${h}:${m}`);
     }
   }
-  agendamentos.forEach((a) => {
-    if (a.horario) {
-      const [h, m] = a.horario.split(":");
-      const horarioNormalizado = `${h.padStart(2, "0")}:${m.padStart(2, "0")}`;
-      base.add(horarioNormalizado);
-    }
-  });
+agendamentos.forEach((a) => {
+  const s = (a.horario ?? '').toString().trim();
+  if (!s || s === '-' || s === '0') return;            // sem agendamento
+
+  let norm = s;
+  if (!s.includes(':')) {
+    // "9" -> "09:00"
+    norm = `${String(s).padStart(2, "0")}:00`;
+  } else {
+    const [h, m = "00"] = s.split(":");
+    norm = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  }
+  base.add(norm);
+});
   return Array.from(base).sort((a, b) => a.localeCompare(b));
 };
 
@@ -181,16 +197,17 @@ const agendamentosFiltradosDia = agendamentos.filter((item) => {
   let matchStatus = false;
   let matchDia = false;
 
-  if (filtroDia === "Hoje") {
-    matchDia = diaItem === hojeBR;
-    matchStatus = statusAceitosHoje.includes(statusNormalizado);
-  } else if (filtroDia === "Todos") {
-    matchDia = true;
-    matchStatus = statusNormalizado === "agendado";
-  } else if (filtroDia === "Data") {
-    matchDia = diaItem === dataSelecionada;
-    matchStatus = statusAceitosData.includes(statusNormalizado);
-  }
+if (filtroDia === "Hoje") {
+  matchDia = mesmaData(diaItem, hojeBR);
+  matchStatus = statusAceitosHoje.includes(statusNormalizado);
+} else if (filtroDia === "Todos") {
+  matchDia = true;
+  matchStatus = statusNormalizado === "agendado";
+} else if (filtroDia === "Data") {
+  matchDia = mesmaData(diaItem, dataSelecionada);
+  matchStatus = statusAceitosData.includes(statusNormalizado);
+}
+
 
   console.log("Comparando datas:", diaItem, "===", hojeBR);
 
