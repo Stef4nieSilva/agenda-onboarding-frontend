@@ -148,7 +148,7 @@ export default function Dashboard() {
         <div className="metric-box destaque-final">
           <div className="faltam-destaque">
             Faltam para Bater a Meta: <span className="faltam-valor">
-              {(97 - parseFloat(porcentagemResolvidosFiltrado)).toFixed(2)}%
+              {(98 - parseFloat(porcentagemResolvidosFiltrado)).toFixed(2)}%
             </span>
           </div>
         </div>
