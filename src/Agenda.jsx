@@ -180,7 +180,7 @@ agendamentos.forEach((a) => {
   return Array.from(base).sort((a, b) => a.localeCompare(b));
 };
 
-const todosAgentesOrdenados = ["Diego", "Maria", "Priscila", "Maria"];
+const todosAgentesOrdenados = ["Diego", "Maria", "Priscila", "Stefanie"];
 const agentesFiltrados =
   agenteSelecionado === "Todos" ? todosAgentesOrdenados : [agenteSelecionado];
 
